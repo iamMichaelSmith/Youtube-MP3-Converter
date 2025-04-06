@@ -479,15 +479,12 @@ app.get('/api/download', async (req, res) => {
     const url = req.query.url;
     const format = req.query.format;
     
-    if (!url || !format) {
-        return res.status(400).json({ error: 'URL and format are required' });
+    if (!url) {
+        return res.status(400).json({ error: 'URL is required' });
     }
     
-    // Determine file extension
-    const ext = format.toLowerCase();
-    if (ext !== 'mp3' && ext !== 'wav') {
-        return res.status(400).json({ error: 'Format must be mp3 or wav' });
-    }
+    // Only MP3 format is supported
+    const ext = 'mp3';
     
     try {
         // Create a unique ID for this download
@@ -636,16 +633,8 @@ app.get('/direct-download/:filename', (req, res) => {
         return res.status(404).send('File not found');
     }
     
-    const ext = path.extname(filename).toLowerCase().substring(1);
-    
-    // Set content-type based on file extension
-    if (ext === 'mp3') {
-        res.set('Content-Type', 'audio/mpeg');
-    } else if (ext === 'wav') {
-        res.set('Content-Type', 'audio/wav');
-    } else {
-        res.set('Content-Type', 'application/octet-stream');
-    }
+    // Set content-type for MP3
+    res.set('Content-Type', 'audio/mpeg');
     
     // Set headers for download
     res.set({

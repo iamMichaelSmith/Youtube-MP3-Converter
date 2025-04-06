@@ -1,7 +1,8 @@
-# YouTube to MP3/WAV Converter Project
+# YouTube to MP3 Converter: Project Summary
 
 ## Project Objective
-Create a web application that allows users to download YouTube videos as MP3 or WAV audio files, with a modern interface, reliable download functionality, and cross-platform compatibility.
+
+This project aims to create a user-friendly web application that allows users to download YouTube videos as MP3 audio files. The goal is to provide a simple, modern interface that makes the conversion process straightforward while ensuring high-quality audio output.
 
 ## Technologies & Services Used
 - **Development Environment**: Cursor IDE
@@ -101,7 +102,7 @@ Create a web application that allows users to download YouTube videos as MP3 or 
 **Solution**: Added better error handling for port binding and clear error messages
 
 ## Final Outcome
-A fully functional YouTube to MP3/WAV converter that:
+A fully functional YouTube to MP3 converter that:
 - Successfully extracts video information (title, author, duration, thumbnail)
 - Downloads actual YouTube audio without requiring FFmpeg
 - Works reliably with multiple fallback methods
@@ -113,4 +114,6 @@ A fully functional YouTube to MP3/WAV converter that:
 - Implement playlist downloading
 - Add user authentication and download history
 - Optimize for mobile devices
-- Implement better audio tagging with metadata 
+- Implement better audio tagging with metadata
+
+The application has been designed to handle a variety of YouTube video formats, extract audio content, and convert it to MP3 format while maintaining good audio quality. The interface is intuitive, allowing users to simply paste a YouTube URL, fetch video information, and download the audio with minimal steps. 

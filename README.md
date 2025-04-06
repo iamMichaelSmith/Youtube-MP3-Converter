@@ -1,6 +1,6 @@
-# YouTube to MP3/WAV Converter
+# YouTube to MP3 Converter
 
-A modern web application for downloading YouTube videos as MP3 or WAV audio files.
+A modern web application for downloading YouTube videos as MP3 audio files.
 
 ## ✅ Working Solution (Updated April 2025)
 
@@ -53,7 +53,7 @@ Then access the application at: http://localhost:3001
 
 ## Features
 
-- Convert YouTube videos to MP3 or WAV format
+- Convert YouTube videos to MP3 format
 - Modern dark theme UI
 - Fetches video information (title, author, duration, thumbnail)
 - Simple user experience
@@ -94,8 +94,7 @@ Then access the application at: http://localhost:3001
 1. Navigate to http://localhost:3001 in your browser
 2. Enter a YouTube URL
 3. Click "Fetch Info" to retrieve the video details
-4. Select your format (MP3 or WAV)
-5. Click "Convert" to download the audio
+4. Click "Convert" to download the MP3 file
 
 ## Technical Details
 

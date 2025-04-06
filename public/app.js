@@ -212,14 +212,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Get selected format
-        let format = 'mp3'; // Default
-        for (const radio of formatRadios) {
-            if (radio.checked) {
-                format = radio.value;
-                break;
-            }
-        }
+        // Always use MP3 format
+        const format = 'mp3';
 
         try {
             // Show loading state
