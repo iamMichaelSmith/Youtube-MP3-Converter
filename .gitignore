@@ -1,0 +1,37 @@
+# Dependencies
+/node_modules
+
+# Generated files
+/downloads/*
+!downloads/.gitkeep
+
+# Environment
+.env
+.env.local
+
+# FFmpeg
+/ffmpeg
+/ffmpeg.exe
+/ffmpeg.zip
+
+# yt-dlp
+/yt-dlp.exe
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Editor/IDE specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Application specific
+*.mp3
+*.wav
+cookies.txt 
