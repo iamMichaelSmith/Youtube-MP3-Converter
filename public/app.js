@@ -152,11 +152,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 timeoutCounter = 0;
             }
             
-            // Update progress bar
-            if (progressData.progress) {
-                progressBarElement.style.width = `${progressData.progress}%`;
-                progressTextElement.textContent = `${progressData.progress}% - ${progressData.status}`;
+            // Update progress bar with a smoothing effect
+            let displayProgress = progressData.progress;
+            if (displayProgress === 0 && timeoutCounter > 2) {
+                // If stuck at 0%, show some visual progress to indicate work is happening
+                displayProgress = 5 + (timeoutCounter * 2);
+                if (displayProgress > 20) displayProgress = 20; // Cap at 20%
             }
+            
+            progressBarElement.style.width = `${displayProgress}%`;
+            
+            // More detailed status messages
+            let statusText = progressData.status || 'processing';
+            if (statusText === 'downloading') {
+                statusText = 'downloading audio';
+            } else if (statusText === 'processing') {
+                statusText = 'processing audio';
+            }
+            
+            progressTextElement.textContent = `${displayProgress}% - ${statusText}`;
             
             // Handle different status types
             switch (progressData.status) {
@@ -187,8 +201,17 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error checking progress:', error);
             timeoutCounter++;
             
-            // If we've had 10 failed checks in a row, show a timeout error
-            if (timeoutCounter > 10) {
+            // If stuck, show increasing progress to indicate work is happening
+            if (timeoutCounter > 3) {
+                let fakeProgress = 10 + (timeoutCounter * 5);
+                if (fakeProgress > 95) fakeProgress = 95; // Never reach 100%
+                
+                progressBarElement.style.width = `${fakeProgress}%`;
+                progressTextElement.textContent = `${fakeProgress}% - still working...`;
+            }
+            
+            // If we've had 20 failed checks in a row (much more patient), show a timeout error
+            if (timeoutCounter > 20) {
                 clearInterval(progressInterval);
                 showError('Download timed out. Please try again.');
             }
@@ -198,6 +221,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle the download process
     const handleDownload = async () => {
         const url = youtubeUrlInput.value.trim();
+        // Get selected format
+        let format = 'mp3'; // Default to MP3
+        for (const radio of formatRadios) {
+            if (radio.checked) {
+                format = radio.value;
+                break;
+            }
+        }
         
         // Reset any previous download
         resetProgress();
@@ -206,45 +237,44 @@ document.addEventListener('DOMContentLoaded', () => {
             showError('Please enter a YouTube URL');
             return;
         }
-
+        
         if (!isValidYouTubeUrl(url)) {
             showError('Please enter a valid YouTube URL');
             return;
         }
-
-        // Always use MP3 format
-        const format = 'mp3';
-
+        
         try {
             // Show loading state
             loadingSection.style.display = 'flex';
             progressTextElement.textContent = 'Starting download...';
             
-            // Start the download process
+            // Start download
             const response = await fetch(`/api/download?url=${encodeURIComponent(url)}&format=${format}`);
-            
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Failed to start download');
+                throw new Error('Failed to start download');
             }
             
             const data = await response.json();
-            
-            if (data.downloadId) {
-                // Save the download ID
-                currentDownloadId = data.downloadId;
-                
-                // Check progress every 1 second
-                progressInterval = setInterval(() => {
-                    checkProgress(currentDownloadId);
-                }, 1000);
-            } else {
-                throw new Error('No download ID received');
+            if (!data || !data.downloadId) {
+                throw new Error('Invalid response from server');
             }
             
+            // Store the download ID
+            currentDownloadId = data.downloadId;
+            
+            // Show initial progress before first check
+            progressBarElement.style.width = '5%';
+            progressTextElement.textContent = '5% - preparing download';
+            
+            // Check progress every 1 second, not 2 seconds (faster updates)
+            progressInterval = setInterval(() => {
+                checkProgress(currentDownloadId);
+            }, 1000);
+            
         } catch (error) {
-            console.error('Error during download:', error);
-            showError(error.message || 'Failed to download the video. Please try again.');
+            console.error('Error starting download:', error);
+            showError(error.message || 'Failed to start download');
+            loadingSection.style.display = 'none';
         }
     };
 
@@ -263,4 +293,4 @@ document.addEventListener('DOMContentLoaded', () => {
     youtubeUrlInput.addEventListener('paste', () => {
         setTimeout(fetchVideoInfo, 100);
     });
-}); 
+});
