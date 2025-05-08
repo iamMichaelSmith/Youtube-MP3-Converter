@@ -1,0 +1,7 @@
+{
+  "name": "youtube-mp3-converter-simple",
+  "version": "1.0.0",
+  "description": "Simple test for YouTube MP3 Converter",
+  "main": "app.js",
+  "dependencies": {}
+} 

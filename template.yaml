@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: YouTube MP3 Converter Serverless Application
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Deployment stage
+
+Globals:
+  Function:
+    Timeout: 900  # 15 minutes max timeout for video processing
+    MemorySize: 1024
+    Runtime: nodejs16.x
+    Environment:
+      Variables:
+        S3_BUCKET: !Ref YoutubeMP3Bucket
+
+Resources:
+  # API Gateway
+  YoutubeMp3API:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'GET, POST, OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  # S3 Bucket for storing MP3 files
+  YoutubeMP3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub youtube-mp3-converter-files-${AWS::AccountId}-${Stage}
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteAfterOneDay
+            Status: Enabled
+            ExpirationInDays: 1
+
+  # Video Info Function
+  GetVideoInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/videoInfo.handler
+      CodeUri: ./
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref YoutubeMP3Bucket
+      Events:
+        GetVideoInfo:
+          Type: Api
+          Properties:
+            RestApiId: !Ref YoutubeMp3API
+            Path: /api/info
+            Method: get
+
+  # Convert Video Function
+  ConvertVideoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/convertVideo.handler
+      CodeUri: ./
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref YoutubeMP3Bucket
+      Events:
+        ConvertVideo:
+          Type: Api
+          Properties:
+            RestApiId: !Ref YoutubeMp3API
+            Path: /api/convert
+            Method: post
+
+  # Progress Check Function
+  CheckProgressFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/progress.handler
+      CodeUri: ./
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref YoutubeMP3Bucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProgressTable
+      Events:
+        CheckProgress:
+          Type: Api
+          Properties:
+            RestApiId: !Ref YoutubeMp3API
+            Path: /api/progress/{downloadId}
+            Method: get
+
+  # FFmpeg Lambda Layer - Keeping it but not referencing it from functions
+  FFmpegLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: ffmpeg-yt-dlp-layer
+      Description: Layer with FFmpeg and yt-dlp
+      ContentUri: layers/ffmpeg/
+      CompatibleRuntimes:
+        - nodejs16.x
+      RetentionPolicy: Retain
+
+  # DynamoDB table for tracking progress
+  ProgressTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub youtube-mp3-converter-progress-${Stage}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: downloadId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: downloadId
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expiryTime
+        Enabled: true
+
+  # Bucket Policy for S3 access
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref YoutubeMP3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:DeleteObject
+            Resource: !Sub ${YoutubeMP3Bucket.Arn}/*
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub https://${YoutubeMp3API}.execute-api.${AWS::Region}.amazonaws.com/${Stage}
+  S3BucketName:
+    Description: S3 bucket for MP3 files
+    Value: !Ref YoutubeMP3Bucket 
