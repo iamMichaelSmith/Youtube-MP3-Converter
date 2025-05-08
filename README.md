@@ -1,8 +1,14 @@
-# YouTube MP3 Converter - Serverless AWS Edition
+# YouTube MP3 Converter
 
-A YouTube to MP3 converter application built using serverless architecture on AWS. This application allows users to convert YouTube videos to high-quality MP3 audio files quickly and easily, utilizing AWS's modern serverless service stack.
+A modern web application for downloading YouTube videos as MP3 audio files, available in two implementations:
+1. Express.js web server (original implementation)
+2. AWS Serverless architecture (new implementation)
 
-## Architecture
+## 🚀 AWS Serverless Implementation
+
+This implementation uses modern AWS serverless architecture to deliver a scalable, cost-effective solution.
+
+### AWS Architecture
 
 This application leverages a fully serverless architecture on AWS with the following services:
 
@@ -14,7 +20,7 @@ This application leverages a fully serverless architecture on AWS with the follo
 - **IAM**: Fine-grained security policies for each Lambda function
 - **Lambda Layers**: Shared code and binary dependencies (FFmpeg, yt-dlp)
 
-## Infrastructure as Code (IaC)
+### Infrastructure as Code (IaC)
 
 This project utilizes the AWS Serverless Application Model (SAM) framework, which extends CloudFormation to provide a simplified way of defining serverless resources. Key benefits include:
 
@@ -24,7 +30,7 @@ This project utilizes the AWS Serverless Application Model (SAM) framework, whic
 - **Resource Policies**: Fine-grained IAM permissions defined declaratively
 - **Cloud Development Kit (CDK) Compatible**: Can be extended with AWS CDK if needed
 
-## Project Structure
+### AWS Project Structure
 
 ```
 /
@@ -43,20 +49,12 @@ This project utilizes the AWS Serverless Application Model (SAM) framework, whic
 ├── template.yaml           # SAM/CloudFormation template
 ├── buildspec.yml           # CodeBuild specification file
 ├── aws-config.js           # AWS SDK configuration
-├── package.json
-└── README.md
+└── package.json
 ```
 
-## Prerequisites
+### AWS Deployment Instructions
 
-- AWS CLI configured with appropriate credentials
-- Node.js 16+
-- AWS SAM CLI
-- FFmpeg and yt-dlp binaries for Lambda layer (Linux compatible)
-
-## Deployment Instructions
-
-### 1. Setup
+#### 1. Setup
 
 Clone the repository and install dependencies:
 
@@ -64,7 +62,7 @@ Clone the repository and install dependencies:
 npm install
 ```
 
-### 2. Configure AWS Credentials
+#### 2. Configure AWS Credentials
 
 Ensure you have AWS credentials configured with appropriate permissions:
 
@@ -80,7 +78,7 @@ Required IAM permissions:
 - DynamoDB full access
 - IAM role creation permissions
 
-### 3. Prepare Lambda Layer
+#### 3. Prepare Lambda Layer
 
 The FFmpeg layer requires Linux-compatible binaries:
 
@@ -95,7 +93,7 @@ mkdir -p layers/ffmpeg/bin
 # Ensure files are executable
 ```
 
-### 4. Deploy with SAM
+#### 4. Deploy with SAM
 
 ```bash
 # Build the application
@@ -108,29 +106,7 @@ sam deploy --guided
 ./deploy-sam.bat
 ```
 
-During deployment, SAM will:
-1. Create an S3 deployment bucket
-2. Package Lambda functions
-3. Deploy Lambda layer with FFmpeg
-4. Create API Gateway, DynamoDB table, and S3 bucket
-5. Set up IAM roles and policies
-6. Output the API endpoint URL
-
-### 5. Deploy the Frontend
-
-After the backend deployment is complete, update the API endpoint in the frontend:
-
-```javascript
-const API_BASE_URL = 'https://your-api-id.execute-api.us-east-1.amazonaws.com/dev';
-```
-
-Then deploy the frontend to an S3 bucket configured for static website hosting:
-
-```bash
-aws s3 sync frontend/ s3://your-frontend-bucket/ --acl public-read
-```
-
-## Resource Management
+### AWS Resource Management
 
 The application creates several AWS resources:
 
@@ -143,7 +119,7 @@ The application creates several AWS resources:
 - **Lambda Layer**: `ffmpeg-yt-dlp-layer` - Contains binary dependencies
 - **API Gateway**: RESTful API with CORS support
 
-## Automated Resource Lifecycle
+### Automated Resource Lifecycle
 
 The application implements several automated lifecycle policies:
 
@@ -151,40 +127,119 @@ The application implements several automated lifecycle policies:
 - **DynamoDB TTL**: Progress records expire automatically
 - **Lambda Timeouts**: Processing functions timeout after 15 minutes maximum
 
-## Security Considerations
+## 🖥️ Express.js Implementation (Original)
 
-- IAM roles follow the principle of least privilege
-- S3 bucket blocks public access
-- API endpoints can be secured with API keys or Cognito (configurable)
-- Data is not persisted beyond necessary timeframes
+The original implementation uses a Node.js Express server with direct YouTube audio downloads.
 
-## CI/CD Integration
+### How to Run (Windows)
 
-For continuous integration and deployment, this repository is configured with AWS CodeBuild using the included `buildspec.yml` file. When set up with CodePipeline, changes pushed to the repository will automatically trigger a new deployment.
+Make sure you run these commands from the correct directory:
+
+```powershell
+# Navigate to the project directory (use semicolon for PowerShell)
+cd "E:\Virtual Box VMs\YT to MP3 app\YT-to-MP3-Converter"; 
+
+# Start the server
+node server.js
+```
+
+Then access the application at: http://localhost:3001
+
+### 🐳 Docker Support
+
+You can also run this application using Docker, which eliminates all dependency issues:
+
+#### Using Docker Compose (Recommended)
+
+```bash
+# Build and start the container
+docker-compose up -d
+
+# To stop the container
+docker-compose down
+```
+
+#### Using Docker Directly
+
+```bash
+# Build the Docker image
+docker build -t youtube-mp3-converter .
+
+# Run the container
+docker run -p 3001:3001 -v $(pwd)/downloads:/app/downloads youtube-mp3-converter
+```
+
+## Features
+
+- Convert YouTube videos to MP3 format
+- Modern dark theme UI
+- Fetches video information (title, author, duration, thumbnail)
+- Simple user experience
+- Responsive design
+
+## Requirements
+
+### Without Docker:
+- Node.js (v14+)
+- Internet connection
+
+### With Docker:
+- Docker and Docker Compose
+- Internet connection
+
+## Installation (Express.js Version)
+
+### Standard Installation
+1. Clone the repository
+2. Install dependencies:
+   ```
+   npm install
+   ```
+3. Start the application:
+   ```
+   node server.js
+   ```
+
+### Docker Installation
+1. Clone the repository
+2. Build and run using Docker Compose:
+   ```
+   docker-compose up -d
+   ```
 
 ## Usage
 
-1. Open the application URL in your browser
-2. Paste a YouTube URL in the input field
-3. Click "Fetch Info" to verify the video
-4. Click "Convert & Download" to convert the video to MP3
-5. The MP3 file will download automatically when ready
+1. Navigate to http://localhost:3001 in your browser (or your deployed API URL for AWS)
+2. Enter a YouTube URL
+3. Click "Fetch Info" to retrieve the video details
+4. Click "Convert" to download the MP3 file
+
+## Technical Details
+
+### Frontend
+- HTML5, CSS3, JavaScript
+- Responsive design
+- Dark theme UI
+
+### Backend
+- Node.js with Express.js or AWS Lambda
+- YouTube data extraction using yt-dlp
+- Direct stream downloading
+
+## Legal Notice
+
+This application is for personal use only. Please respect copyright laws and YouTube's terms of service. The developers are not responsible for any misuse of this tool.
 
 ## License
 
-This project is licensed under the ISC License.
+MIT
 
-## Disclaimer
+## Contributing
 
-This tool is for personal use only. Please respect copyright laws and terms of service for YouTube.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Professional Implementation Notes
+## Acknowledgments
 
-This project demonstrates several advanced AWS architecture patterns:
-
-- **Serverless Event-Driven Architecture**: Using Lambda functions triggered by API Gateway
-- **Infrastructure as Code**: Complete AWS infrastructure defined in SAM template
-- **Binary Dependency Management**: Using Lambda Layers for FFmpeg and yt-dlp
-- **Resource Lifecycle Management**: Automated cleanup of temporary resources
-- **Separation of Concerns**: Modular Lambda functions with specific responsibilities
-- **Cost Optimization**: Pay-per-use pricing model with auto-expiring resources 
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) for providing the core downloading functionality
+- AWS SAM for serverless implementation
+- Node.js and Express.js for the backend framework

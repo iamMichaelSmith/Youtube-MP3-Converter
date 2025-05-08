@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  youtube-mp3-converter:
+    build: .
+    container_name: youtube-mp3-converter
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./downloads:/app/downloads
+    restart: unless-stopped 

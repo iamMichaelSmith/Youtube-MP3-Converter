@@ -1,5 +1,6 @@
 # Dependency directories
 node_modules/
+/node_modules
 jspm_packages/
 
 # Build directories
@@ -10,6 +11,10 @@ build/
 # Binary files
 *.msi
 *.exe
+/ffmpeg
+/ffmpeg.exe
+/ffmpeg.zip
+/yt-dlp.exe
 
 # Environment variables
 .env
@@ -43,4 +48,19 @@ coverage/
 
 # OS specific files
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Generated files
+/downloads/*
+!downloads/.gitkeep
+
+# Editor/IDE specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Application specific
+*.mp3
+*.wav
+cookies.txt

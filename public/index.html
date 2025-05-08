@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube to MP3 Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>YouTube to MP3 Converter</h1>
+            <p class="tagline">Download YouTube videos as high-quality MP3 audio files</p>
+        </header>
+
+        <main>
+            <section class="card converter-card">
+                <div class="input-section">
+                    <h2>Enter YouTube URL</h2>
+                    <div class="url-input-container">
+                        <input type="text" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+                        <button id="fetchInfoBtn">Fetch Info</button>
+                    </div>
+                    
+                    <div class="format-selection">
+                        <p>Format:</p>
+                        <div class="radio-group">
+                            <input type="radio" id="mp3" name="format" value="mp3" checked>
+                            <label for="mp3">MP3</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="videoInfo" class="video-info-section" style="display: none;">
+                    <div class="video-details">
+                        <div class="thumbnail-container">
+                            <img id="thumbnail" src="" alt="Video thumbnail">
+                        </div>
+                        <div class="text-details">
+                            <h3 id="videoTitle">Video Title</h3>
+                            <p>Channel: <span id="videoAuthor">Channel Name</span></p>
+                            <p>Duration: <span id="videoDuration">0:00</span></p>
+                        </div>
+                    </div>
+                    <button id="convertBtn" class="convert-btn">
+                        <i class="fas fa-download"></i> Convert & Download
+                    </button>
+                </div>
+                
+                <div id="loadingSection" class="loading-section" style="display: none;">
+                    <div class="progress-container">
+                        <div class="progress-bar-container">
+                            <div id="progressBar" class="progress-bar"></div>
+                        </div>
+                        <p id="progressText" class="progress-text">Processing...</p>
+                    </div>
+                </div>
+                
+                <div id="downloadLinkContainer" class="download-section" style="display: none;">
+                    <p>Your MP3 file is ready!</p>
+                    <a id="downloadLink" href="#" download>Click here to download</a>
+                    <p class="download-note">If download doesn't start automatically, click the button above.</p>
+                </div>
+                
+                <div id="errorMessage" class="error-message" style="display: none;">
+                    Something went wrong. Please try again.
+                </div>
+            </section>
+
+            <section class="card instructions-card">
+                <h2>How it works</h2>
+                <ol>
+                    <li>Copy a YouTube video URL</li>
+                    <li>Paste it into the input field above</li>
+                    <li>Click "Fetch Info" to verify the video</li>
+                    <li>Click "Convert & Download" to save the MP3 file</li>
+                </ol>
+                <p class="note">Note: This tool is for personal use only. Please respect copyright laws.</p>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 YouTube to MP3 Converter | <a href="https://github.com/iamMichaelSmith/Youtube-MP3-Converter" target="_blank">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html> 
